@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Repository specific configuration file for
-# post-commit script.
+# post-commit git hook script.
 #
 # Author: Yakup Akbay <yakbay@ubicom.com>
 #
@@ -14,27 +14,26 @@
 # The following variables can be set to suite
 # your needs:
 #
-# MAIL_TO='list of email addresses'
-# MAIL_CC='list of email addresses'
-# MAIL_BCC='list of email addresses'
-# MAIL_BODY_PREFIX='a text message to be placed before the 
-# commit diff.'
-# MAIL_BODY_POSTFIX='a text message to be placed after the 
-# commit diff.'
+# EMAIL_TO='List of email addresses'
+# EMAIL_CC='List of email addresses'
+# EMAIL_BCC='List of email addresses'
+# EMAIL_BODY_PREFIX='A text message to be placed before the commit diff.'
+# EMAIL_BODY_POSTFIX='A text message to be placed after the commit diff.'
+# BRANCH_NAME_SEPARATOR='Type your preferred separator here. The default 
+# 			 branch name separator is ':''
+# PARENT_REPOSITORY_NAME_SEPARATOR='Type your preferred separator here. 
+# 				    The default parent repository name 
+#				    separator is '/''
+# PARENT_REPOSITORY_NAME='Type the name of the parent repository here
+# 			  if the repository has submodules.'
+# MAX_EMAIL_ATTACHMENT_LEN=A decimal number in terms of characters.
+# MAX_EMAIL_DIFF_LEN=A decimal number in terms of characters.
+# MAX_EMAIL_SUBJECT_LEN=A decimal number in terms of characters.
 
-MAIL_TO='CVS-SDK <CVS-SDK@ubicom.com>'
-MAIL_CC='linux-all <linux-all@ubicom.com>'
-MAIL_BCC='hehehe'
-MAIL_BODY_PREFIX="Hi,
-
-`git log --pretty=format:%s --max-count=1`
-
-Regards,
-Yakup
-
-
-"
-MAIL_BODY_POSTFIX='
-
-'
+PARENT_REPOSITORY_NAME=''
+EMAIL_TO=''
+EMAIL_CC=''
+EMAIL_BCC=''
+EMAIL_BODY_PREFIX=''
+EMAIL_BODY_POSTFIX=''
 
