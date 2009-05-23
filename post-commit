@@ -1,0 +1,106 @@
+#!/bin/sh
+#
+# A git hook script that is called after a successful
+# commit is made.
+#
+# This script pops up a thunderbird email composer and
+# fills out all of the necessary fields with information 
+# from the latest commit.
+#
+# Author: Yakup Akbay <yakbay@ubicom.com>
+#
+# The email subject will look like: 
+#	[<repository name>:<branch name>] <commit id> - <commit message>
+#
+# 	The only exception is that branch name is not printed 
+# 	for master branch.
+#
+# It is best to put this script to a place you wish, 
+# then create symbolic links to it from any git repository.
+# This file (or the symlink) must be placed under .git/hooks folder.
+# 
+# Do the followings:
+#
+# 	1. cd path/to/repo/.git/hooks
+# 	2. ln -s path/to/the/script post-commit
+#	3. Optionally, create a file named .config-post-commit
+#	   with the following variables set in it: 
+#	   EMAIL_TO, EMAIL_CC, EMAIL_BCC,  EMAIL_BODY_PREFIX, 
+#	   EMAIL_BODY_POSTFIX. (See the sample config file)
+#	   Above fields will be left blank if no config file 
+#	   is present.
+# 	4. Make sure that the script and symlinks are executable.
+#
+# TODO: Add support for other email clients. Currently, only 
+# 	thundebird is supported.
+
+
+# Check whether thunderbird is installed
+which thunderbird > /dev/null 2>&1 || exit
+
+# Path to the repository specific config file
+CONFIG_FILE=`pwd`/.git/hooks/.config-post-commit
+
+# Include the config file if one exists. 
+[ -e $CONFIG_FILE ] && . $CONFIG_FILE
+
+# Get the repository name
+REPOSITORY_NAME="$(basename `pwd`)"
+
+# Get the branch name that we are currently on
+BRANCH_NAME=`git branch | grep '\* ' | cut -c3-`
+
+# Use ':' as seperator if undefined
+BRANCH_NAME_SEPARATOR=${BRANCH_NAME_SEPARATOR=':'}
+
+# Don't print branch name when on master
+if [ $BRANCH_NAME == "master" ]; then
+	BRANCH_NAME_WITH_SEPARATOR=
+else
+	BRANCH_NAME_WITH_SEPARATOR=$BRANCH_NAME_SEPARATOR$BRANCH_NAME
+fi
+
+# Commit diff rules:
+#  - If the commit diff is larger than MAX_EMAIL_ATTACHMENT_LEN no diff is included in the email.
+#  - If the commit diff is less than MAX_EMAIL_ATTACHMENT_LEN, but larger than MAX_EMAIL_DIFF_LEN
+#    then the diff is attached as a diff file.
+#  - If the commit diff smaller than MAX_EMAIL_DIFF_LEN then the diff is embedded in the email body.
+MAX_EMAIL_ATTACHMENT_LEN=8192
+MAX_EMAIL_DIFF_LEN=1024
+EMAIL_DIFF_LEN="$(git show | wc --chars)"
+DIFF_FILE_EXT='diff'
+COMMIT_SHA1=`git log --pretty=format:%h --max-count=1`
+COMMIT_MSG=`git log --pretty=format:%s --max-count=1`
+
+# Prepare email subject. Limit it to MAX_EMAIL_SUBJECT_LEN characters. 
+MAX_EMAIL_SUBJECT_LEN=80
+EMAIL_SUBJECT="[$REPOSITORY_NAME$BRANCH_NAME_WITH_SEPARATOR] $COMMIT_SHA1 - $COMMIT_MSG"
+EMAIL_SUBJECT=${EMAIL_SUBJECT:0:$MAX_EMAIL_SUBJECT_LEN}
+
+# Prepare email body
+if [ "$EMAIL_DIFF_LEN" -gt "$MAX_EMAIL_ATTACHMENT_LEN" ]; then
+	EMAIL_BODY="The diff is not included in this email due to its large size. 
+		    To see the diff, please use 'git show $COMMIT_SHA1'"
+
+	# Compose an email for the last commit in thunderbird
+	EMAIL_STRING="to='$EMAIL_TO',cc='$EMAIL_CC',bcc='$EMAIL_BCC',subject='$EMAIL_SUBJECT',body='$EMAIL_BODY_PREFIX$EMAIL_BODY$EMAIL_BODY_POSTFIX'"
+elif [ "$EMAIL_DIFF_LEN" -gt "$MAX_EMAIL_DIFF_LEN" ]; then
+	EMAIL_BODY='See diff file.'
+	DIFF_FILE_PATH=`pwd`/.git/hooks
+	DIFF_FILE=$DIFF_FILE_PATH/$COMMIT_SHA1.diff
+	rm $DIFF_FILE_PATH/*.$DIFF_FILE_EXT > /dev/null 2>&1
+	touch $DIFF_FILE
+	git show > $DIFF_FILE
+
+	# Compose an email for the last commit in thunderbird
+	EMAIL_STRING="to='$EMAIL_TO',cc='$EMAIL_CC',bcc='$EMAIL_BCC',subject='$EMAIL_SUBJECT',body='$EMAIL_BODY_PREFIX$EMAIL_BODY$EMAIL_BODY_POSTFIX',attachment='file://$DIFF_FILE'"
+else
+	EMAIL_BODY="$(git show)"
+
+	# Compose an email for the last commit in thunderbird
+	EMAIL_STRING="to='$EMAIL_TO',cc='$EMAIL_CC',bcc='$EMAIL_BCC',subject='$EMAIL_SUBJECT',body='$EMAIL_BODY_PREFIX$EMAIL_BODY$EMAIL_BODY_POSTFIX'"
+fi
+
+thunderbird -compose "$EMAIL_STRING" &
+
+

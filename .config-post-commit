@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# Repository specific configuration file for
+# post-commit script.
+#
+# Author: Yakup Akbay <yakbay@ubicom.com>
+#
+# It is recommended to create symbolic links to
+# a single config file for using the same settings
+# across repositories. Doing so, you can edit/update
+# your configuration parameters by editing a single 
+# configuration file.
+#
+# The following variables can be set to suite
+# your needs:
+#
+# MAIL_TO='list of email addresses'
+# MAIL_CC='list of email addresses'
+# MAIL_BCC='list of email addresses'
+# MAIL_BODY_PREFIX='a text message to be placed before the 
+# commit diff.'
+# MAIL_BODY_POSTFIX='a text message to be placed after the 
+# commit diff.'
+
+MAIL_TO='CVS-SDK <CVS-SDK@ubicom.com>'
+MAIL_CC='linux-all <linux-all@ubicom.com>'
+MAIL_BCC='hehehe'
+MAIL_BODY_PREFIX="Hi,
+
+`git log --pretty=format:%s --max-count=1`
+
+Regards,
+Yakup
+
+
+"
+MAIL_BODY_POSTFIX='
+
+'
+

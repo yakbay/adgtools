@@ -1,0 +1,104 @@
+#!/bin/bash
+
+CMD=$1
+P1=$2
+P2=$3
+ERR=1
+SCRIPT_NAME=$(basename $0)
+
+function pingall {
+	IP_START=${P2:-100}
+	IP_END=${P3:-$(($P1 + 2))}
+	for i in `seq $IP_START $IP_END`
+	do
+		ping 172.18.200.$i -c1 | grep "ttl="
+#		read -n 1
+	done
+}
+
+function term {
+	gnome-terminal \
+	--window-with-profile=KeepTitle \
+		--full-screen \
+		--working-directory=/home/adg/ubicom/uClinux \
+		--title=uClinux \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/adg/ubicom/projects/ultra2 \
+		--title=Ultra \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/adg \
+		--title=Debug \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/adg \
+		--title=tty7k
+		--execute telnet 172.18.201.155 50
+}
+
+function gitlog {
+	i=0
+	while [ 1 ]; do
+		clear
+		echo "INDEX: $i"
+		git show HEAD~$i $@
+		echo -e '\E[32;49m'
+		echo "What next?"
+		echo "	[x] exit	[b] back	[n] next"
+		echo -e '\E[30;49m'
+		read -s -n1 key
+		if [ "$key" = "x" ]; then
+			break
+		elif [ "$key" = "b" ]; then
+			if [ $i -gt 0 ]; then
+				let i=i-1
+			fi
+		elif [ "$key" = "n" ]; then
+			let i=i+1
+		fi
+	done
+}
+
+function usage {
+
+	echo "|	USAGE: Runs the specified adg command."
+	echo "|"
+	echo "|	Available commands:"
+	echo "|		pingall"
+	echo "|		term"
+	echo "|		gitlog [--]"
+	echo "|		help, --help or -h"
+	echo "|"
+	echo "|	Command descriptions:"
+	echo "|		term:	Opens new development terminal window with 4 tabs. (uClinux, ultra, debug and telnet)"
+	echo "|		gitlog:	Walks in git history and shows a single commit in each step."
+	exit $ERR
+}
+
+function adg {
+	echo "| ADG's collection of commands"
+	echo "| Author: Yakup Akbay <yakbay@ubicom.com>"
+}
+
+if [ "$CMD" == "" ]; then
+	adg
+	echo "|"
+	usage
+fi
+
+case "$CMD" in
+    adg)
+	adg
+	;;
+    term)
+	term
+	;;
+    gitlog)
+	gitlog
+	;;
+    pingall)
+	pingall
+	;;
+    --help|help|-h)
+	usage
+	;;
+esac
+

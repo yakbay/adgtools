@@ -1,0 +1,9 @@
+#
+# Normal rules
+#
+
+*~
+
+# we like to keep .gitignore files
+!.gitignore
+
