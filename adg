@@ -19,9 +19,11 @@ function pingall {
 function term {
 	gnome-terminal \
 	--window-with-profile=KeepTitle \
-		--full-screen \
 		--working-directory=/home/adg/ubicom/uClinux \
 		--title=uClinux \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/adg/ubicom/uClinux/ubicom32/ultra \
+		--title=uClinux/ubicom32/ultra \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/adg/ubicom/uClinux/user \
 		--title=uClinux/user \
