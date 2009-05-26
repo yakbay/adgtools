@@ -23,15 +23,15 @@ function term {
 		--working-directory=/home/adg/ubicom/uClinux \
 		--title=uClinux \
 	--tab-with-profile=KeepTitle \
-		--working-directory=/home/adg/ubicom/projects/ultra2 \
-		--title=Ultra \
+		--working-directory=/home/adg/ubicom/uClinux/user \
+		--title=uClinux/user \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/adg \
 		--title=Debug \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/adg \
 		--title=tty7k
-		--execute telnet 172.18.201.155 50
+		--execute "telnet 172.18.201.155 50"
 }
 
 function gitlog {
