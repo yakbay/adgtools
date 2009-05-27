@@ -47,10 +47,20 @@ CONFIG_FILE=`pwd`/.git/hooks/.config-post-commit
 # Get the repository name
 REPOSITORY_NAME="$(basename `pwd`)"
 
+# Use '/' as parent repository name seperator if undefined
+PARENT_REPOSITORY_NAME_SEPARATOR=${PARENT_REPOSITORY_NAME_SEPARATOR='/'}
+
+# Don't print parent repository name
+if [ "$PARENT_REPOSITORY_NAME" == "$REPOSITORY_NAME" ]; then
+	PARENT_REPOSITORY_NAME_WITH_SEPARATOR=
+else
+	PARENT_REPOSITORY_NAME_WITH_SEPARATOR=$PARENT_REPOSITORY_NAME$PARENT_REPOSITORY_NAME_SEPARATOR
+fi
+
 # Get the branch name that we are currently on
 BRANCH_NAME=`git branch | grep '\* ' | cut -c3-`
 
-# Use ':' as seperator if undefined
+# Use ':' as branch name seperator if undefined
 BRANCH_NAME_SEPARATOR=${BRANCH_NAME_SEPARATOR=':'}
 
 # Don't print branch name when on master
@@ -74,7 +84,7 @@ COMMIT_MSG=`git log -1 --pretty=format:%s`
 
 # Prepare email subject. Limit it to MAX_EMAIL_SUBJECT_LEN characters. 
 MAX_EMAIL_SUBJECT_LEN=80
-EMAIL_SUBJECT="[$REPOSITORY_NAME$BRANCH_NAME_WITH_SEPARATOR] $COMMIT_SHA1 - $COMMIT_MSG"
+EMAIL_SUBJECT="[$PARENT_REPOSITORY_NAME_WITH_SEPARATOR$REPOSITORY_NAME$BRANCH_NAME_WITH_SEPARATOR] $COMMIT_SHA1 - $COMMIT_MSG"
 EMAIL_SUBJECT=${EMAIL_SUBJECT:0:$MAX_EMAIL_SUBJECT_LEN}
 
 # Prepare email body

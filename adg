@@ -45,7 +45,7 @@ function gitlog {
 		echo -e '\E[32;49m'
 		echo "What next?"
 		echo "	[x] exit	[b] back	[n] next"
-		echo -e '\E[30;49m'
+		echo -e '\E[0m'
 		read -s -n1 key
 		if [ "$key" = "x" ]; then
 			break
