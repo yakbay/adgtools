@@ -75,15 +75,15 @@ fi
 #  - If the commit diff is less than MAX_EMAIL_ATTACHMENT_LEN, but larger than MAX_EMAIL_DIFF_LEN
 #    then the diff is attached as a diff file.
 #  - If the commit diff smaller than MAX_EMAIL_DIFF_LEN then the diff git showis embedded in the email body.
-MAX_EMAIL_ATTACHMENT_LEN=262144
-MAX_EMAIL_DIFF_LEN=16384
+MAX_EMAIL_ATTACHMENT_LEN=${MAX_EMAIL_ATTACHMENT_LEN=65536}
+MAX_EMAIL_DIFF_LEN=${MAX_EMAIL_DIFF_LEN=8192}
 EMAIL_DIFF_LEN="$(git show | wc --chars)"
 DIFF_FILE_EXT='diff'
 COMMIT_SHA1=`git log -1 --pretty=format:%h`
 COMMIT_MSG=`git log -1 --pretty=format:%s`
 
 # Prepare email subject. Limit it to MAX_EMAIL_SUBJECT_LEN characters. 
-MAX_EMAIL_SUBJECT_LEN=80
+MAX_EMAIL_SUBJECT_LEN=${MAX_EMAIL_SUBJECT_LEN=128}
 EMAIL_SUBJECT="[$PARENT_REPOSITORY_NAME_WITH_SEPARATOR$REPOSITORY_NAME$BRANCH_NAME_WITH_SEPARATOR] $COMMIT_SHA1 - $COMMIT_MSG"
 EMAIL_SUBJECT=${EMAIL_SUBJECT:0:$MAX_EMAIL_SUBJECT_LEN}
 
@@ -97,9 +97,9 @@ if [ "$EMAIL_DIFF_LEN" -gt "$MAX_EMAIL_ATTACHMENT_LEN" ]; then
 	# Compose an email for the last commit in thunderbird
 	EMAIL_STRING="to='$EMAIL_TO',cc='$EMAIL_CC',bcc='$EMAIL_BCC',subject='$EMAIL_SUBJECT',body='$EMAIL_BODY_PREFIX$EMAIL_BODY$EMAIL_BODY_POSTFIX'"
 elif [ "$EMAIL_DIFF_LEN" -gt "$MAX_EMAIL_DIFF_LEN" ]; then
-	EMAIL_BODY"$(git log -1)
+	EMAIL_BODY="$(git log -1)
 
-		   See the diff file."
+		    See the diff file."
 	DIFF_FILE_PATH=`pwd`/.git/hooks
 	DIFF_FILE=$DIFF_FILE_PATH/$COMMIT_SHA1.diff
 	rm $DIFF_FILE_PATH/*.$DIFF_FILE_EXT > /dev/null 2>&1
