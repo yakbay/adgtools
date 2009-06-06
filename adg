@@ -3,6 +3,7 @@
 CMD=$1
 P1=$2
 P2=$3
+PALL=${@##$1}
 ERR=1
 SCRIPT_NAME=$(basename $0)
 
@@ -41,7 +42,7 @@ function gitlog {
 	while [ 1 ]; do
 		clear
 		echo "INDEX: $i"
-		git show HEAD~$i $@
+		git log -1 HEAD~$i $PALL
 		echo -e '\E[32;49m'
 		echo "What next?"
 		echo "	[x] exit	[b] back	[n] next"
