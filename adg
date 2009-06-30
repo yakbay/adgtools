@@ -20,19 +20,19 @@ function pingall {
 function term {
 	gnome-terminal \
 	--window-with-profile=KeepTitle \
-		--working-directory=/home/adg/ubicom/uClinux \
+		--working-directory=/home/adg/ubicom/ubicom-distro \
+		--title=ubicom-distro \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/adg/ubicom/ubicom-distro/uClinux \
 		--title=uClinux \
 	--tab-with-profile=KeepTitle \
-		--working-directory=/home/adg/ubicom/uClinux/ubicom32/ultra \
-		--title=uClinux/ubicom32/ultra \
-	--tab-with-profile=KeepTitle \
-		--working-directory=/home/adg/ubicom/uClinux/user \
+		--working-directory=/home/adg/ubicom/ubicom-distro/uClinux/user \
 		--title=uClinux/user \
 	--tab-with-profile=KeepTitle \
-		--working-directory=/home/adg \
+		--working-directory=/home/adg/ubicom \
 		--title=Debug \
 	--tab-with-profile=KeepTitle \
-		--working-directory=/home/adg \
+		--working-directory=/home/adg/ubicom \
 		--title=tty7k
 		--execute "telnet 172.18.201.155 50"
 }
