@@ -7,6 +7,10 @@ PALL=${@##$1}
 ERR=1
 SCRIPT_NAME=$(basename $0)
 
+function ctool {
+	wine /home/adg/ubicom/sdk/tools/bin/win32/ConfigTool.exe $P1
+}
+
 function pingall {
 	IP_START=${P2:-100}
 	IP_END=${P3:-$(($P1 + 2))}
@@ -20,21 +24,21 @@ function pingall {
 function term {
 	gnome-terminal \
 	--window-with-profile=KeepTitle \
-		--working-directory=/home/adg/ubicom/ubicom-distro \
+		--working-directory=/home/adg/$P1/ubicom-distro \
 		--title=ubicom-distro \
 	--tab-with-profile=KeepTitle \
-		--working-directory=/home/adg/ubicom/ubicom-distro/uClinux \
+		--working-directory=/home/adg/$P1/ubicom-distro/uClinux \
 		--title=uClinux \
 	--tab-with-profile=KeepTitle \
-		--working-directory=/home/adg/ubicom/ubicom-distro/uClinux/user \
+		--working-directory=/home/adg/$P1/ubicom-distro/uClinux/user \
 		--title=uClinux/user \
 	--tab-with-profile=KeepTitle \
-		--working-directory=/home/adg/ubicom \
+		--working-directory=/home/adg/$P1 \
 		--title=Debug \
 	--tab-with-profile=KeepTitle \
-		--working-directory=/home/adg/ubicom \
+		--working-directory=/home/adg/$P1 \
 		--title=tty7k
-		--execute "telnet 172.18.201.155 50"
+#		-execute telnet 172.18.201.155 50
 }
 
 function gitlog {
@@ -92,6 +96,14 @@ case "$CMD" in
 	adg
 	;;
     term)
+	if [ "$P1" == "" ]; then
+		# default to ~/ubicom
+		P1="ubicom"
+	fi
+	if [ ! -d "/home/adg/$P1" ]; then
+		echo "/home/adg/$P1 is not a directory!"
+		exit 1;
+	fi
 	term
 	;;
     gitlog)
@@ -99,6 +111,9 @@ case "$CMD" in
 	;;
     pingall)
 	pingall
+	;;
+    ctool)
+	ctool
 	;;
     --help|help|-h)
 	usage
