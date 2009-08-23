@@ -1,0 +1,43 @@
+[user]
+	name = Yakup Akbay
+	email = yakbay@ubicom.com
+[color]
+# Available colors and formattings:
+# 	colors: black, white, yellow, green, red, magenta
+#	formattings: reverse, bold
+	ui = auto
+[color "branch"]
+	current = yellow reverse
+	local = yellow
+	remote = green
+[color "diff"]
+	meta = white
+	frag = magenta
+	old = red
+	new = green
+[color "status"]
+	added = green
+	changed = yellow
+	untracked = red
+[core]
+	compression=9
+	whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol
+	pager = less -FXRS
+[pack]
+	threads = 0
+[alias]
+	st = status
+	ci = commit
+	br = branch
+	co = checkout
+	df = diff
+	dfc = diff --cached
+	dfh = diff HEAD
+	dff = diff FETCH_HEAD
+	dffh = diff FETCH_HEAD..HEAD
+	dfhf = diff HEAD..FETCH_HEAD
+	dfom = diff origin/master
+[push]
+	default = matching
+[sendemail]
+	smtpserver = /usr/bin/thunderbird
