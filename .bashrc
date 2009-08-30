@@ -104,7 +104,7 @@ _bold=$(tput bold)
 _normal=$(tput sgr0)
 
 __vcs_dir() {
-	local vcs base_dir sub_dir ref repo_path
+	local vcs base_dir sub_dir ref base_path
 	sub_dir() {
 	  local sub_dir
 	  sub_dir=$(stat -f "${PWD}")
@@ -124,8 +124,8 @@ __vcs_dir() {
 	  ref=$(git symbolic-ref -q HEAD || git name-rev --name-only HEAD 2>/dev/null)
 	  ref=${ref#refs/heads/}
 	  vcs="git"
-	  repo_path="$(dirname "${base_dir}")"
-	  repo_path="${repo_path/$HOME/~}"
+	  base_path="$(dirname "${base_dir}")"
+	  base_path="${base_path/$HOME/~}"
 	  base_dir="$(basename "${base_dir}")"
 	}
 
@@ -134,18 +134,15 @@ __vcs_dir() {
 	if [ -n "$vcs" ]; then
 # don't print git	  __vcs_prefix="($vcs)"
 	  __vcs_base_dir="${base_dir/$HOME/~}"
-	  __vcs_repo_path="${repo_path}/"
+	  __vcs_base_path="${base_path}/"
 	  __vcs_ref="[$ref]"
 	  __vcs_sub_dir="${sub_dir}"
 	else
 	  __vcs_prefix=''
-	  __vcs_repo_path=''
-	  __vcs_base_dir_temp=`basename "$PWD"`
-	  if [ "$PWD" == "$HOME" ]; then
-	    __vcs_base_dir="~"
-          else
-	    __vcs_base_dir="`basename "$PWD"`"
-	  fi
+	  __vcs_base_path=''
+#	    __vcs_base_dir="`basename "$PWD"`"
+	  __vcs_base_dir="$PWD"
+	  __vcs_base_dir="${__vcs_base_dir/$HOME/~}"
 	  __vcs_ref=''
 	  __vcs_sub_dir=''
 	fi
