@@ -78,12 +78,12 @@ esac
 if [ -x /usr/bin/dircolors ]; then
     eval "`dircolors -b`"
     alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
 
-    #alias grep='grep --color=auto'
-    #alias fgrep='fgrep --color=auto'
-    #alias egrep='egrep --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
 fi
 
 # some more ls aliases
@@ -97,6 +97,62 @@ fi
 if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
 fi
+
+# special prompt information for git repositories
+# Format: <user name>:<repo path>/<repo name>[branch]<sub dir>$
+_bold=$(tput bold)
+_normal=$(tput sgr0)
+
+__vcs_dir() {
+	local vcs base_dir sub_dir ref repo_path
+	sub_dir() {
+	  local sub_dir
+	  sub_dir=$(stat -f "${PWD}")
+	  sub_dir=${sub_dir#$1}
+	  echo ${sub_dir#/}
+	}
+
+	git_dir() {
+	  base_dir=$(git rev-parse --show-cdup 2>/dev/null) || return 1
+	  if [ -n "$base_dir" ]; then
+	    base_dir=`cd $base_dir; pwd`
+	  else
+            base_dir=$PWD
+          fi
+          sub_dir=$(git rev-parse --show-prefix)
+	  sub_dir="/${sub_dir%/}"
+	  ref=$(git symbolic-ref -q HEAD || git name-rev --name-only HEAD 2>/dev/null)
+	  ref=${ref#refs/heads/}
+	  vcs="git"
+	  repo_path="$(dirname "${base_dir}")"
+	  repo_path="${repo_path/$HOME/~}"
+	  base_dir="$(basename "${base_dir}")"
+	}
+
+	git_dir
+
+	if [ -n "$vcs" ]; then
+# don't print git	  __vcs_prefix="($vcs)"
+	  __vcs_base_dir="${base_dir/$HOME/~}"
+	  __vcs_repo_path="${repo_path}/"
+	  __vcs_ref="[$ref]"
+	  __vcs_sub_dir="${sub_dir}"
+	else
+	  __vcs_prefix=''
+	  __vcs_repo_path=''
+	  __vcs_base_dir_temp=`basename "$PWD"`
+	  if [ "$PWD" == "$HOME" ]; then
+	    __vcs_base_dir="~"
+          else
+	    __vcs_base_dir="`basename "$PWD"`"
+	  fi
+	  __vcs_ref=''
+	  __vcs_sub_dir=''
+	fi
+}
+
+PROMPT_COMMAND=__vcs_dir
+PS1='\[\033]0;\u@\h:\w\007\]\u:$__vcs_prefix${__vcs_repo_path}\[${_bold}\]${__vcs_base_dir}\[${_normal}\]${__vcs_ref}\[${_bold}\]${__vcs_sub_dir}\[${_normal}\]\$ '
 
 # Setup ubicom32 development environment
 export PATH=$PATH:/home/adg/ubicom/ubicom32toolchain/bin:/home/adg/ubicom/adgtools
