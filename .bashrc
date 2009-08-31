@@ -157,3 +157,7 @@ export PATH=$PATH:/home/adg/ubicom/ubicom32toolchain/bin:/home/adg/ubicom/adgtoo
 export TOOLCHAIN_DIR=~/ubicom/ubicom32toolchain
 export UBICOM_DONGLE_IP=172.18.201.155
 export UBICOM_DONGLE=$UBICOM_DONGLE_IP:5010
+
+# Hack for ssh authentication issue
+# http://www.archivum.info/ubuntu-bugs@lists.ubuntu.com/2008-07/32809/%5BBug_201786%5D_Re:_ssh_Agent_admitted_failure_to_sign_using_the_key
+export SSH_AUTH_SOCK=0
