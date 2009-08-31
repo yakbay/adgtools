@@ -1,0 +1,187 @@
+::: C V S :::::::::::::::::::::::::::::::::::::::::::::::::::::::
+Update için: cvs -z9 update -C -A -d -P
+cvs log: cvs log config.uClibc
+Diff: cvs diff config.uClibc
+Diff 2 versions: cvs diff -r 1.4 -r 1.5 config.uClibc
+Commit:  cvs commit -m "set LAN ip first, then WAN ip. Add miniupnpd application." start_rd
+
+::: G E N E R A L :::::::::::::::::::::::::::::::::::::::::::::::
+tar.lzma açmak için: lzma -cd filename.tar.lzma | tar -xvf (dikkat! bulunduğu yere açar)
+
+thordan toolchain indirmek için:
+rsync -hP thor://home/ultra/toolchain/ubicom32toolchain-20090608.tar.lzma .
+
+telnet ayarları:
+CTRL + ] bas
+telnet> node character
+CTRL + ] bas
+set crlf
+
+bash script renkli yazı:
+echo -e '\E[30m black \E[31mred \E[32mgreen \E[33myellow \E[34mblue \E[35mmagenta \E[36mcyan \E[37mwhite'
+
+Color:           Foreground:           Background:
+---------------------------------------------------------
+black             30                       40
+red               31                       41
+green             32                       42
+yellow            33                       43
+blue              34                       44
+magenta           35                       45
+cyan              36                       46
+white             37                       47
+
+NFS:
+Add share to /etc/exports (örnek: /home/adg/shared 172.18.200.0/255.255.254.0(r,sync,subtree_check,no_root_squash))
+adg@adghp:/etc$ sudo init.d/nfs-kernel-server restart
+mount -t nfs 172.18.200.186:/home/adg/shared /mnt -o nolock
+
+Install sonrası:
+- create symbolic link for libexpat.so.0
+	+ cd /usr/lib
+	+ sudo ln -s libexpat.so.1.5.2 libexpat.so.0
+- make bash default shell
+	+ sudo rm /bin/sh
+	+ sudo ln -s /bin/bash /bin/sh
+***************
+
+::: G D B :::::::::::::::::::::::::::::::::::::::::::
+t a a bt: thread apply all backtrace ('t a a <cmd>' <cmd> komutunu bütün thread'lere uygula).
+i r $<reg>: <reg> registerin içeriğini bastır.
+i r: bütün registerları bastır.
+up/down <n>: o anki stack'te <n> miktarı yukarı/aşağı hareket et
+i args: o anki fonksiyonun argumanlarını göster.
+call <func>: <func> fonksiyonunu çalıştırır.
+
+
+::: M I N I U P N P D :::::::::::::::::::::::::::::::::::::::::::
+***************
+miniupnpd için yapılanlar:
+ - rename uClinux/user/miniupnpd/Makefile to Makefile.securecomputing
+ - rename uClinux/user/miniupnpd/Makefile.linux to Makefile
+ - comment out CFLAGS definition
+ - comment out CC definition
+ - comment out line: LIBS = -liptc
+ - add line: 
+	LIBS = ../iptables/libiptc/libiptc.a -lpthread
+ - add lines:
+	$(EXECUTABLES): $(ALLOBJS)
+		$(CC) $(LDFLAGS) -o $@ $(ALLOBJS) $(LDLIBS$(LDLIBS_$@)) $(LIBS)
+ 
+ - add lines:
+	romfs:
+		$(ROMFSINST) miniupnpd /bin/miniupnpd
+
+ - uClinux/vendors/Ubicom/IP7160_RGWEval_BSP ???
+ - change in daemonize.c:
++	#ifdef  __uClinux__
++		switch(vfork())
++	#else
+		switch(fork())
++	#endif
+ - change in miniupnp.c:
++	#ifdef SECURE_COMPUTING
+			/* Check if we need to reload the redirection rules */
+			if (reload_rules)
+			{
+				reload_redirects();
+				reload_rules = 0;
+			}
++	#endif
+ - add lines to start_rd:
+	#Start miniupnpd (UPnP Internet Gateway Device)
+	echo "***Running miniupnpd (UPnP Internet Gateway Device)***"
+	miniupnpd -i eth0 -a 192.168.0.1 -p 5000 -U &
+
+***************
+To run miniupnpd:
+> miniupnpd -i eth0 -a 192.168.0.1 -p 5000 -U -d &
+(-d for debug)
+
+
+::: G N U  M A K E :::::::::::::::::::::::::::::::::::::::::::
+***************
+<cmd> | tee <logfile> komutu ile <cmd> komutunu çalıştırıp çıktısını hem console'a hem de <logfile>'a basabiliriz.
+
+GNU Make notes:
+
+Default makefile ismi 'Makefile', 'makefile' (ayrıca GNU make için özel olarak 'GNUmakefile').
+Başka makefile ismi kullanmak için 'make -f dosya' ya da 'make --file=dosya' kullanılır.
+En baştaki rule 'default goal'dır. Yani hiç bir parametre verilmezse bu rule çalıştırılır.
+Pattern (* ? vs. içeren) rule ilk sırada bile olsa default goal olamaz.
+Period '.' ile başlayan rule'lar da default goal olamaz.
+Rule'un ilk satırı dependencey listesidir.
+Rule'un altındaki satırlar komut listesidir. 
+'$@' rule ismini içerir. Mesela aşağıdaki rule ekrana 'deneme' basar:
+	deneme: 
+		@echo $@
+
+'$?' dependency listesindeki değişen dosya isimmini içerir.
+	deneme: *.c
+		@echo $?
+		touch deneme
+
+; işareti komutları ayırır. Mesela; 'deneme: ;@echo $@; echo "deneme"' (DİKKAT! Aynı satırdaki birden fazla komut için bir tane @ kullanılabilir!)
+Komutlar TAB ile başlamak zorunda!
+TAB ile başlayan her şey shell'e yollanır, o ne yaparsa yapar.
+başına @ işareti konan komutun kendisi ekrana basılmaz, yoksa basılır.
+başına - işareti konan komut hata dönerse ignore edilir. Mesela; 'rm dosya' komutu eğer dosya bulunamazsa hata döner. Fakat '-rm dosya' komutu bunu build hatası olarak kabul etmez.
+Yenileme kriteri: Target dosyası yoksa veya dependency dosyalarından birinden daha eskiyse yeniden oluşturulur.
+commentler # ile başlar \# ile biter.
+Başka makefile'ları kapsamak için 'include' kullanılır. 'include dosya' şeklinde bir kullanım olan yerde o anki dosyanın işlenmesi o noktada bekletilir ve 'dosya' çalıştırılır. Bitince kaldığı yerden devam eder.
+'include' direktifine parametre olarak shell file name pattern geçirilebilir: 'include *.mk $(dosya)' gibi. (*.mk olan dosyalar ile 'dosya' aslı dosya çalıştırılır).
+include dosyasının olmaması durumunda hata oluşması istenmiyorsa '-include dosya' ya da 'sinclude dosya' kullanılmalı.
+Global değişken olan 'MAKEFILES' tanımlanmışsa bu tanımda geçen bütün dosyalar sırasıyla işlenir. Dosyalardan biri bulunamazsa hata verilmez.
+MAKEFILES ile tanımlanan dosyalardan default goal kabul edilmez.
+Bazı özel değişkenler:
+	.DEFAULT_GOAL: default goal olan rule'u set etmek için kullanılır. Set etmek için'.DEFAULT_GOAL := rule', iptal etmek için de '.DEFAULT_GOAL :='
+	MAKELEVEL: make'in recursive çağrılma sayısını tutar. Mesela; aşağıdaki rule 0 - 9 arası sayılar basar.
+		deneme:
+		ifneq ($(MAKELEVEL),10)
+			@echo $(MAKELEVEL)
+			@make deneme
+		endif
+
+	.VARIABLES: bütün global değişkenleri basar.
+	.INCLUDE_DIRS: include directory'leri basar. Mesela; '/usr/include /usr/local/include'
+
+::: R P - L 2 T P :::::::::::::::::::::::::::::::::::::::::::
+/user/Kconfig dosyasına şu satırlar eklendi:
+	config USER_RP_L2TP_L2TP
+		bool "rp-l2tp"
+		select USER_L2TPD_L2TPD
+		help
+		  A user-space implementation of L2TP (RFC 2661) for Linux.
+
+/user/Makefile dosyasına şu satır eklendi:
+	dir_$(CONFIG_USER_RP_L2TP_L2TP)             += rp-l2tp
+
+
+::: O p e n W R T :::::::::::::::::::::::::::::::::::::::::::
+* uClibc **************
+bir dizindeki bütün patchleri uygulamak için:
+	for i in ./*.patch ; do echo "patch file: $"; patch -p1 < $i; done
+
+* kernel **************
+make menuconfig
+make (or make V=99 | tee make.log)
+<cmd> | tee <logfile> komutu ile <cmd> komutunu çalıştırıp çıktısını hem console'a hem de <logfile>'a basabiliriz.
+
+Kernel diff:
+diff -ru linux-2.6.28/ linux_ubi/ > kernel.patch
+
+Alternatif diff komutları:
+diff -ru --exclude='.git*' linux-2.6.28/ linux_ubi/ > kernel.patch
+
+Kernel patch:
+patch -p1 < kernel.patch
+
+İşlem sırası:
+	1. Bir yerde kernel'in kopyasını oluştur.
+	2. Source dizini temizle (make distclean, git clean -f)
+	3. Ubicom32 klasörlerini files/ altına taşı
+		+ arch/ubicom32
+		+ sound/ubicom32
+	4. Ubicom'un eklediği diğer dosyaları files/ altına taşı
+		+ /
+

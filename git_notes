@@ -1,0 +1,125 @@
+ultra/3F8tram
+
+SSH:
+Ubicom username linux username'den farklıysa ~/.ssh/config dosyasına şu satırları ekle:
+
+Host *.scenix.com thor
+	User yakbay
+
+***************
+RESET:
+son commit'i geri almak için: git reset HEAD~1 (HEAD'i bir önceki konuma getir)
+son 2 commit'i geri almak için: git reset HEAD~2
+son 2 commiti tamamen iptal etmek için: git reset --hard HEAD~2 (workspace'ten de gider)
+son 2 commiti geri almak için: git reset --soft HEAD~2 (index değişmez, sadece repo etkilenir)
+
+REVERT:
+git-revert: herhangi bir commit'in tersini commitlemek.
+
+BRANCH:
+master: default branch (cvs zamanındaki HEAD ile aynı, TRUNK)
+head: herhangi bir branch'in tepesi. İlgili branch'te son yapılan commit'e işaret eder.
+HEAD: aktif olan branch (mesela master, neye chekout yapılmışsa)
+branch değiştirmek için: git checkout <branch> (örn: git checkout master)
+remote'taki branch'ları görmek için: git branch -r
+remote'taki bir branch'ı çekmek için: git checkout -b branch origin/branch
+
+local repo'dan checkout yapmak için: git checkout <branch> -- <file or folder> (örn1: git checkout master -- .) (örn2: git checkout master -- Makefile)
+
+lokalde yeni branch açmak: git branch <branch_ismi> (git branch test)
+Yeni branch'i push etmek: git push <remote> <branch_ismi> (git push origin test)
+
+Remote'ta var olan bir branch için tracking branch açmak: git co -b <branch ismi> <remote>/<branch_ismi> (git co -b nest origin/test)
+Remote tracking branch'a push yapmak: git push <remote> <lokal_branch>:<remote_branch> (git push origin nest:test)
+Remote tracking branch'a pull yapmak: git pull <remote> <remote_branch> (git pull origin test)
+
+ADD/REMOVE:
+git add <file>'in tersi git reset HEAD <file> (git rm <file> değil!!!)
+git rm --cached <file>'in tersi git reset HEAD <file> (git reset HEAD <file> genel olarak son işlemi geri alır)
+git rm <file> hem indexten düşürür hem de dosyayı file system'den siler.
+
+
+son commit'e ait comment'i editlemek için: git commit --amend -m 'new comment'
+
+LOG:
+log alırken diff'leri de görmek için: git log -p
+
+PUSH/PULL/FETCH:
+pull yapılırken conflict olursa fetch yapılır ama merge yapılmaz.
+fetch yapılınca gelen yeni objeler FETCH_HEAD'de tutulur. (gitk FETCH_HEAD..HEAD ile farka bakılabilir)
+
+UPDATE:
+index'teki bir dosyada yeniden değişiklik yapılırsa: git update-index <dosya ismi> yapılabilir. git add <dosya ismi> aynı işi yapar.
+
+COMMIT:
+direkt commit yapılabilir: git commit <dosya ismi>. Bu şekilde yapılırsa index değişmez.
+git commit hem indexteki değişikliklerin hepsini commitler.
+git commit -a parametre olarak path ya da dosya ismi almaz! Var olan her şeyi commitler.
+
+TAG:
+tag eklemek için: git tag -a tag_name -m "comment" <SHA1 id (default is HEAD)>
+tag silmek için: git tag -d tag_name
+
+ADVANCED:
+master'ı origin/master'a çekmek için: git update-ref refs/heads/master origin/master
+origin/master'ı 3 commit geri çekmek için: git update-ref refs/remotes/origin/master HEAD~3
+DİKKAT! ref update edilince workspace etkilenmez.
+
+Bir dosyanın sha1 değerini hesaplamak için: git hash-object <dosya>
+Hash'ini bildiğimiz bir dosyanın içeriğini görmek için: git cat-file blob SHA1
+
+Hangi günlerde kaç commit yaptığını bulmak için: git log --since=6.months --pretty=format:%cD --author=yakbay |cut -d, -f1 |sort |uniq -c |sort -n
+
+İki branch arasında belli bir user'a ait cherry-pick yapılması gereken ne var?
+git cherry -v release/1.0BSP | grep + |awk '{system("git show --author=yakbay --pretty=format:\"%h %s\" --quiet " $2)}'
+
+İki commit'in en iyi ortak atasını bulmak (birden fazla olabilir!)
+git merge-base commit1 commit2
+
+Benim release branch'a commitlediğim neler var? (en eski en üstte)
+git log $(git merge-base master release/1.0BSP)..release/1.0BSP --author=yakbay --format=%h --reverse
+
+********************
+Local server:
+ssh server@172.18.200.5
+password: ubuntuscenix
+
+gitserver'i manage etmek için kendisi de bir git repository'si olan ve localde clonlanmış bulunan /ubicom/gitosis-admin dizinine gir.
+Gerekli değişiklikleri yap, commitle ve push et.
+
+User eklemeye örnek:
+
+		cd gitosis-admin
+		cp ~/alice.pub keydir/
+		cp ~/bob.pub keydir/
+		git add keydir/alice.pub keydir/bob.pub
+
+	Note that the key filename must have a ".pub" extension.
+
+	gitosis.conf changes:
+
+		 [group myteam]
+		- members = jdoe
+		+ members = jdoe alice bob
+		  writable = free_monkey
+
+	Commit and push:
+
+		git commit -a -m "Granted Alice and Bob commit rights to FreeMonkey"
+		git push
+
+Kaynak: http://scie.nti.st/2007/11/14/hosting-git-repositories-the-easy-and-secure-way
+
+Fast Forward olmayan push'ları engellemek için .git/config içine şunu ekle:
+
+[receive]
+	denyNonFastforwards = true
+
+
+"The core.sharedrepository flag tells git to keep everything group readable and writable.
+
+The receive.denyNonFastforwards flag makes sure that merges can't happen when you push to the repo. You have to do the merges on your local machine, and then push the result.
+
+If you're creating an empty shared repo, you can use the --shared option to git init to set these two flags automatically. A word of warning though: the --shared option to git clone does something completely different."
+
+
