@@ -6,6 +6,8 @@ Diff 2 versions: cvs diff -r 1.4 -r 1.5 config.uClibc
 Commit:  cvs commit -m "set LAN ip first, then WAN ip. Add miniupnpd application." start_rd
 
 ::: G E N E R A L :::::::::::::::::::::::::::::::::::::::::::::::
+vi problem: The solution is to remove vim-tiny and reinstall the vim package. 
+
 tar.lzma açmak için: lzma -cd filename.tar.lzma | tar -xvf (dikkat! bulunduğu yere açar)
 
 thordan toolchain indirmek için:
