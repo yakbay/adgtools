@@ -6,6 +6,8 @@ Diff 2 versions: cvs diff -r 1.4 -r 1.5 config.uClibc
 Commit:  cvs commit -m "set LAN ip first, then WAN ip. Add miniupnpd application." start_rd
 
 ::: G E N E R A L :::::::::::::::::::::::::::::::::::::::::::::::
+C/C++ manual'larını kurmak için manpages-dev kur.
+
 vi problem: The solution is to remove vim-tiny and reinstall the vim package. 
 
 tar.lzma açmak için: lzma -cd filename.tar.lzma | tar -xvf (dikkat! bulunduğu yere açar)
@@ -54,52 +56,6 @@ i r: bütün registerları bastır.
 up/down <n>: o anki stack'te <n> miktarı yukarı/aşağı hareket et
 i args: o anki fonksiyonun argumanlarını göster.
 call <func>: <func> fonksiyonunu çalıştırır.
-
-
-::: M I N I U P N P D :::::::::::::::::::::::::::::::::::::::::::
-***************
-miniupnpd için yapılanlar:
- - rename uClinux/user/miniupnpd/Makefile to Makefile.securecomputing
- - rename uClinux/user/miniupnpd/Makefile.linux to Makefile
- - comment out CFLAGS definition
- - comment out CC definition
- - comment out line: LIBS = -liptc
- - add line: 
-	LIBS = ../iptables/libiptc/libiptc.a -lpthread
- - add lines:
-	$(EXECUTABLES): $(ALLOBJS)
-		$(CC) $(LDFLAGS) -o $@ $(ALLOBJS) $(LDLIBS$(LDLIBS_$@)) $(LIBS)
- 
- - add lines:
-	romfs:
-		$(ROMFSINST) miniupnpd /bin/miniupnpd
-
- - uClinux/vendors/Ubicom/IP7160_RGWEval_BSP ???
- - change in daemonize.c:
-+	#ifdef  __uClinux__
-+		switch(vfork())
-+	#else
-		switch(fork())
-+	#endif
- - change in miniupnp.c:
-+	#ifdef SECURE_COMPUTING
-			/* Check if we need to reload the redirection rules */
-			if (reload_rules)
-			{
-				reload_redirects();
-				reload_rules = 0;
-			}
-+	#endif
- - add lines to start_rd:
-	#Start miniupnpd (UPnP Internet Gateway Device)
-	echo "***Running miniupnpd (UPnP Internet Gateway Device)***"
-	miniupnpd -i eth0 -a 192.168.0.1 -p 5000 -U &
-
-***************
-To run miniupnpd:
-> miniupnpd -i eth0 -a 192.168.0.1 -p 5000 -U -d &
-(-d for debug)
-
 
 ::: G N U  M A K E :::::::::::::::::::::::::::::::::::::::::::
 ***************
