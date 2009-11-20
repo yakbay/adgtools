@@ -7,9 +7,9 @@
 
 # don't put duplicate lines in the history. See bash(1) for more options
 # don't overwrite GNU Midnight Commander's setting of `ignorespace'.
-export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
+HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 # ... or force ignoredups and ignorespace
-export HISTCONTROL=ignoreboth
+HISTCONTROL=ignoreboth
 
 # append to the history file, don't overwrite it
 shopt -s histappend
@@ -36,7 +36,7 @@ esac
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
-#force_color_prompt=yes
+force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
@@ -65,21 +65,12 @@ xterm*|rxvt*)
     ;;
 esac
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-#if [ -f ~/.bash_aliases ]; then
-#    . ~/.bash_aliases
-#fi
-
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
-    eval "`dircolors -b`"
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
-    alias dir='dir --color=auto'
-    alias vdir='vdir --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
 
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
@@ -91,17 +82,26 @@ fi
 #alias la='ls -A'
 #alias l='ls -CF'
 
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [ -f /etc/bash_completion ]; then
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
 # special prompt information for git repositories
 # Format: <user name>:<repo path>/<repo name>[branch]<sub dir>$
-_bold=$(tput bold)
-_normal=$(tput sgr0)
+#_bold=$(tput bold)
+#_normal=$(tput sgr0)
 
 __vcs_dir() {
 	local vcs base_dir sub_dir ref base_path
@@ -149,7 +149,7 @@ __vcs_dir() {
 }
 
 PROMPT_COMMAND=__vcs_dir
-PS1='\[\033]0;\u@\h:\w\007\]\u:${__vcs_prefix}${__vcs_base_path}\[${_bold}\]${__vcs_base_dir}\[${_normal}\]${__vcs_ref}\[${_bold}\]${__vcs_sub_dir}\[${_normal}\]\$ '
+PS1='${__vcs_prefix}${__vcs_base_path}\[\033[01;37m\]${__vcs_base_dir}\[\033[00;00m\]\[\033[00;32m\]${__vcs_ref}\[\033[00;00m\]${__vcs_sub_dir}\$ '
 
 # Setup ubicom32 development environment
 export PATH=$PATH:/home/adg/ubicom/ubicom32toolchain/bin:/home/adg/ubicom/adgtools
@@ -161,3 +161,8 @@ export UBICOM_DONGLE=$UBICOM_DONGLE_IP:5010
 # Hack for ssh authentication issue
 # http://www.archivum.info/ubuntu-bugs@lists.ubuntu.com/2008-07/32809/%5BBug_201786%5D_Re:_ssh_Agent_admitted_failure_to_sign_using_the_key
 export SSH_AUTH_SOCK=0
+
+export LD_LIBRARY_PATH=/usr/local/lib
+
+# List of cameo applications. This is used in commands like grep, find etc.
+export CAMEO_APPS="rc sutil nvram httpd udhcp libplatform iplookup tftpd mail_client pppd timer"
