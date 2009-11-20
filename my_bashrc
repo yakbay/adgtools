@@ -149,7 +149,7 @@ __vcs_dir() {
 }
 
 PROMPT_COMMAND=__vcs_dir
-PS1='${__vcs_prefix}${__vcs_base_path}\[\033[01;37m\]${__vcs_base_dir}\[\033[00;00m\]\[\033[00;32m\]${__vcs_ref}\[\033[00;00m\]${__vcs_sub_dir}\$ '
+PS1='${__vcs_prefix}${__vcs_base_path}\[\033[01;31m\]${__vcs_base_dir}\[\033[00;00m\]\[\033[00;33m\]${__vcs_ref}\[\033[00;00m\]${__vcs_sub_dir}\$ '
 
 # Setup ubicom32 development environment
 export PATH=$PATH:/home/adg/ubicom/ubicom32toolchain/bin:/home/adg/ubicom/adgtools
