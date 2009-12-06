@@ -12,6 +12,9 @@ vi problem: The solution is to remove vim-tiny and reinstall the vim package.
 
 tar.lzma açmak için: lzma -cd filename.tar.lzma | tar -xvf (dikkat! bulunduğu yere açar)
 
+tar.lzma oluşturmak için: tar -cvf - <directory> | lzma -2 > file.tar.lzma (-2 yerine -9'a kadar compression level verilebilir.)
+ya da : tar --lzma -cvf file.tar.lzma <directory>
+
 thordan toolchain indirmek için:
 rsync -hP thor://home/ultra/toolchain/ubicom32toolchain-20090608.tar.lzma .
 
@@ -38,7 +41,7 @@ white             37                       47
 NFS:
 Add share to /etc/exports (örnek: /home/adg/shared 172.18.200.0/255.255.254.0(r,sync,subtree_check,no_root_squash))
 adg@adghp:/etc$ sudo init.d/nfs-kernel-server restart
-mount -t nfs 172.18.200.186:/home/adg/shared /mnt -o nolock
+mount -t nfs 192.168.2.100:/home/adg/shared /mnt -o nolock
 
 Install sonrası:
 - create symbolic link for libexpat.so.0

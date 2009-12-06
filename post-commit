@@ -57,6 +57,11 @@ else
 	PARENT_REPOSITORY_NAME_WITH_SEPARATOR=$PARENT_REPOSITORY_NAME${PARENT_REPOSITORY_NAME:+$PARENT_REPOSITORY_NAME_SEPARATOR}
 fi
 
+# Backup color.ui setting
+local COLOR_CONFIG_ORIG=`git config --get color.ui`
+# Turn off colored output
+git config color.ui never
+
 # Get the branch name that we are currently on
 BRANCH_NAME=`git branch | grep '\* ' | cut -c3-`
 
@@ -114,6 +119,9 @@ else
 	# Compose an email for the last commit in thunderbird
 	EMAIL_STRING="to='$EMAIL_TO',cc='$EMAIL_CC',bcc='$EMAIL_BCC',subject='$EMAIL_SUBJECT',body='$EMAIL_BODY_PREFIX$EMAIL_BODY$EMAIL_BODY_POSTFIX'"
 fi
+
+# Restore original color.ui setting
+git config color.ui $COLOR_CONFIG_ORIG
 
 thunderbird -compose "$EMAIL_STRING" &
 
