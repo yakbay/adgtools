@@ -57,8 +57,9 @@ else
 	PARENT_REPOSITORY_NAME_WITH_SEPARATOR=$PARENT_REPOSITORY_NAME${PARENT_REPOSITORY_NAME:+$PARENT_REPOSITORY_NAME_SEPARATOR}
 fi
 
-# Backup color.ui setting
-local COLOR_CONFIG_ORIG=`git config --get color.ui`
+# Backup local color.ui setting
+COLOR_CONFIG_ORIG=`git config --file $(git rev-parse --git-dir)/config --get color.ui`
+
 # Turn off colored output
 git config color.ui never
 
@@ -121,7 +122,12 @@ else
 fi
 
 # Restore original color.ui setting
-git config color.ui $COLOR_CONFIG_ORIG
+if [[ $COLOR_CONFIG_ORIG == "" ]]; then
+	# Clear the color setting if it was not existing before
+	git config --file $(git rev-parse --git-dir)/config --unset color.ui > /dev/null 2>&1
+else
+	git config color.ui $COLOR_CONFIG_ORIG
+fi
 
 thunderbird -compose "$EMAIL_STRING" &
 
