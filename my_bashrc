@@ -166,3 +166,6 @@ export LD_LIBRARY_PATH=/usr/local/lib
 
 # List of cameo applications. This is used in commands like grep, find etc.
 export CAMEO_APPS="rc sutil nvram httpd udhcp libplatform iplookup tftpd mail_client pppd timer"
+
+alias gitka='gitk --all'
+
