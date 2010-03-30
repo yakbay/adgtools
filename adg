@@ -3,6 +3,7 @@
 CMD=$1
 P1=$2
 P2=$3
+P3=$4
 PALL=${@##$1}
 ERR=1
 SCRIPT_NAME=$(basename $0)
@@ -12,23 +13,41 @@ function ctool {
 }
 
 function term {
+	# Check Dongle 1
+	dongle_ip=`/home/$USER/ubicom/adgtools/get_dongle_ip_from_mac $P2`
+	dongle_name="Dongle"
+	dongle_mac=$P2
+	if [ "$?" != "0" ]; then
+		# Check Dongle 2
+		dongle_ip=`/home/$USER/ubicom/adgtools/get_dongle_ip_from_mac $P3`
+		dongle_name="Dongle"
+		dongle_mac=$P3
+		if [ "$?" != "0" ]; then
+			# No Dongle found!
+			dongle_ip="172.18.201.155"
+			dongle_name="NoDongle"
+		fi
+	fi
+
+	UBICOM_DONGLE_IP=$dongle_ip \
+	UBICOM_DONGLE=$dongle_ip:5010 \
 	gnome-terminal \
+	--maximize \
 	--window-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1 \
-		--title=ubicom-distro \
+		--title="distro [$dongle_ip]" \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1/uClinux \
-		--title=uClinux \
+		--title="uClinux [$dongle_ip]" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/$P1/uClinux/lib \
+		--title="lib [$dongle_ip]" \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1/uClinux/user \
-		--title=uClinux/user \
+		--title="user [$dongle_ip]" \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1 \
-		--title=Debug \
-	--tab-with-profile=KeepTitle \
-		--working-directory=/home/$USER/$P1 \
-		--title=tty7k
-#		-execute telnet 172.18.201.155 50
+		--title="$dongle_name [$dongle_ip]"
 }
 
 function gitlog {

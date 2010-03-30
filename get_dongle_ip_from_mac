@@ -1,0 +1,40 @@
+#!/bin/bash
+# This script prints the IP address of the Ubicom Dongle
+# that's MAC address is given. The MAC address can be given
+# in 2 ways:
+# 	1. as a command line argument
+# 	2. by using the environment variable UBICOM_DONGLE_MAC
+#
+#	Note that the command line argument has precedence over the
+#	environment variable.
+
+# Use the dongle mac address from the environment
+# variables if no mac address is passed as argument.
+DONGLE_MAC=${1:-$UBICOM_DONGLE_MAC}
+
+dongle_mac_ok=`echo $DONGLE_MAC | egrep '^([[:xdigit:]]{2}:[[:xdigit:]]{2}:[[:xdigit:]]{2}:[[:xdigit:]]{2}:[[:xdigit:]]{2}:[[:xdigit:]]{2})$'`
+if [ "$dongle_mac_ok" = "" ]; then
+	echo Invalid MAC address: \'$DONGLE_MAC\'
+	exit 1
+fi
+
+# Scan all devices
+# find the info block for the given MAC address
+# find the IP line
+# print the IP address
+dongle_ip=`/home/adg/ubicom/ubicom-distro/ultra/tools/bin/linux/udm4linux -s 2>&1 /dev/null \
+	| grep -A 2 $DONGLE_MAC \
+	| grep IP \
+	| awk -F': ' '{print $2}'`
+
+if [ "$dongle_ip" = "" ]; then
+	echo Device \'$DONGLE_MAC\' not found!
+	exit 1
+fi
+
+# Print the IP address (no newline at the end)
+echo -n $dongle_ip
+
+# Exit with success code
+exit 0
+	
