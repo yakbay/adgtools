@@ -1,4 +1,4 @@
-#!/bin/bash
+	#!/bin/bash
 
 CMD=$1
 P1=$2
@@ -14,19 +14,25 @@ function ctool {
 
 function term {
 	# Check Dongle 1
-	dongle_ip=`/home/$USER/ubicom/adgtools/get_dongle_ip_from_mac $P2`
-	dongle_name="Dongle"
 	dongle_mac=$P2
+	dongle_ip=`/home/$USER/ubicom/adgtools/get_dongle_ip_from_mac $dongle_mac`
 	if [ "$?" != "0" ]; then
 		# Check Dongle 2
-		dongle_ip=`/home/$USER/ubicom/adgtools/get_dongle_ip_from_mac $P3`
-		dongle_name="Dongle"
 		dongle_mac=$P3
+		dongle_ip=`/home/$USER/ubicom/adgtools/get_dongle_ip_from_mac $dongle_mac`
 		if [ "$?" != "0" ]; then
 			# No Dongle found!
-			dongle_ip="172.18.201.155"
-			dongle_name="NoDongle"
+			dongle_ip="No dongle!"
+			dongle_mac=""
 		fi
+	fi
+
+	if [ "$dongle_mac" = "00:03:64:00:05:15" ]; then
+		dongle_name="Dongle1"
+	elif [ "$dongle_mac" = "00:03:64:00:05:9c" ]; then
+		dongle_name="Dongle2"
+	else
+		dongle_name=""
 	fi
 
 	UBICOM_DONGLE_IP=$dongle_ip \
