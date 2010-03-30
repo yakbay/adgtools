@@ -11,16 +11,6 @@ function ctool {
 	wine /home/adg/ubicom/sdk/tools/bin/win32/ConfigTool.exe $P1
 }
 
-function pingall {
-	IP_START=${P2:-100}
-	IP_END=${P3:-$(($P1 + 2))}
-	for i in `seq $IP_START $IP_END`
-	do
-		ping 172.18.200.$i -c1 | grep "ttl="
-#		read -n 1
-	done
-}
-
 function term {
 	gnome-terminal \
 	--window-with-profile=KeepTitle \
@@ -69,7 +59,6 @@ function usage {
 	echo "|	USAGE: Runs the specified adg command."
 	echo "|"
 	echo "|	Available commands:"
-	echo "|		pingall"
 	echo "|		term"
 	echo "|		gitlog [--]"
 	echo "|		help, --help or -h"
@@ -108,9 +97,6 @@ case "$CMD" in
 	;;
     gitlog)
 	gitlog
-	;;
-    pingall)
-	pingall
 	;;
     ctool)
 	ctool
