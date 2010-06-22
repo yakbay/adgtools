@@ -1,3 +1,20 @@
+::: Android :::::::::::::::::::::::::::::::::::::::::::::::::::::
+To build Android SDK on ubuntu karmic, add following sources to the package manager:
+deb http://us.archive.ubuntu.com/ubuntu/ jaunty multiverse
+deb http://us.archive.ubuntu.com/ubuntu/ jaunty-updates multiverse
+
+Then install java5 (bin, jre, jdk) and remove above sources.
+
+To use java5:
+export JAVA_HOME=/usr/lib/jvm/java-1.5.0-sun-1.5.0.19
+export PATH=$JAVA_HOME/bin:$PATH
+
+To build the SDK:
+. build/envsetup.sh
+launch
+(choose 1)
+<nice> make -j8
+
 ::: C V S :::::::::::::::::::::::::::::::::::::::::::::::::::::::
 Update için: cvs -z9 update -C -A -d -P
 cvs log: cvs log config.uClibc
