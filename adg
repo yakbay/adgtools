@@ -41,16 +41,16 @@ function term {
 	--maximize \
 	--window-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1 \
-		--title="distro [$dongle_ip]" \
+		--title="ubicom-distro" \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1/uClinux \
-		--title="uClinux [$dongle_ip]" \
+		--title="uClinux" \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1/uClinux/lib \
-		--title="lib [$dongle_ip]" \
+		--title="uClinux/lib" \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1/uClinux/user \
-		--title="user [$dongle_ip]" \
+		--title="uClinux/user" \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1 \
 		--title="$dongle_name [$dongle_ip]"
