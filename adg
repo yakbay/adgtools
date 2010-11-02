@@ -1,4 +1,4 @@
-	#!/bin/bash
+#!/bin/bash
 
 CMD=$1
 P1=$2
@@ -10,6 +10,27 @@ SCRIPT_NAME=$(basename $0)
 
 function ctool {
 	wine /home/adg/ubicom/sdk/tools/bin/win32/ConfigTool.exe $P1
+}
+
+function termandroid {
+	gnome-terminal \
+	--maximize \
+	--window-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ubicom/android-ubicom-apps/MyMusic \
+		--title="MyMusic" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ubicom/android-ubicom-apps/DLNARemoteService \
+		--title="DLNARemoteService" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ubicom/ubicom-distro-iap/uClinux/user/dlnad \
+		--title="DLNADaemon" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ubicom/ubicom-distro-iap/uClinux/user/dlnad \
+		--title="DLNADaemon RUN" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ \
+		--title="adb" \
+		--command="sudo su"
 }
 
 function term {
@@ -108,6 +129,9 @@ fi
 case "$CMD" in
     adg)
 	adg
+	;;
+    termandroid)
+	termandroid
 	;;
     term)
 	if [ "$P1" == "" ]; then
