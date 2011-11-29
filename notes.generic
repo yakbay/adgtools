@@ -163,3 +163,10 @@ patch -p1 < kernel.patch
 	4. Ubicom'un eklediği diğer dosyaları files/ altına taşı
 		+ /
 
+::: A f t e r   U b u n t u   I n s t a l l :::::::::::::::::::::::::::::::::::::::::::
+
+In addition to the ones in the wiki:
+
+sudo apt-get install gtk-doc-tools
+sudo apt-get install libxml2-dev
+
