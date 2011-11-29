@@ -12,28 +12,7 @@ function ctool {
 	wine /home/adg/ubicom/sdk/tools/bin/win32/ConfigTool.exe $P1
 }
 
-function termandroid {
-	gnome-terminal \
-	--maximize \
-	--window-with-profile=KeepTitle \
-		--working-directory=/home/$USER/ubicom/android-ubicom-apps/MyMusic \
-		--title="MyMusic" \
-	--tab-with-profile=KeepTitle \
-		--working-directory=/home/$USER/ubicom/android-ubicom-apps/DLNARemoteService \
-		--title="DLNARemoteService" \
-	--tab-with-profile=KeepTitle \
-		--working-directory=/home/$USER/ubicom/ubicom-distro-iap/uClinux/user/dlnad \
-		--title="DLNADaemon" \
-	--tab-with-profile=KeepTitle \
-		--working-directory=/home/$USER/ubicom/ubicom-distro-iap/uClinux/user/dlnad \
-		--title="DLNADaemon RUN" \
-	--tab-with-profile=KeepTitle \
-		--working-directory=/home/$USER/ \
-		--title="adb" \
-		--command="sudo su"
-}
-
-function term {
+function find_dongles {
 	# Check Dongle 1
 	dongle_mac=$P2
 	dongle_ip=`/home/$USER/ubicom/adgtools/get_dongle_ip_from_mac $dongle_mac`
@@ -55,14 +34,68 @@ function term {
 	else
 		dongle_name=""
 	fi
+}
 
-	UBICOM_DONGLE_IP=$dongle_ip \
-	UBICOM_DONGLE=$dongle_ip:5010 \
+function termandroid {
+	gnome-terminal \
+	--maximize \
+	--window-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ubicom/android-ubicom-apps/MyMusic \
+		--title="MyMusic" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ubicom/android-ubicom-apps/DLNARemoteService \
+		--title="DLNARemoteService" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ubicom/ubicom-distro-iap/uClinux/user/dlnad \
+		--title="DLNADaemon" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ubicom/ubicom-distro-iap/uClinux/user/dlnad \
+		--title="DLNADaemon RUN" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ \
+		--title="adb" \
+		--command="sudo su"
+}
+
+function termVSE {
+	find_dongles
+	export UBICOM_DONGLE_IP=$dongle_ip
+	export UBICOM_DONGLE=$dongle_ip:5010
+
 	gnome-terminal \
 	--maximize \
 	--window-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1 \
-		--title="ubicom-distro" \
+		--title="VSE[$P1]" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/$P1/openwrt \
+		--title="openwrt" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/$P1/openwrt/package/sestatd \
+		--title="sestatd" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/ubicom/android-ubicom-apps/SEDashboard \
+		--title="SEDashboard" \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/$P1 \
+		--title="adb" \
+		--command="sudo su"  \
+	--tab-with-profile=KeepTitle \
+		--working-directory=/home/$USER/$P1 \
+		--title="$dongle_name [$dongle_ip]" \
+		--command="telnet $dongle_ip 50"
+}
+
+function term {
+	find_dongles
+	export UBICOM_DONGLE_IP=$dongle_ip
+	export UBICOM_DONGLE=$dongle_ip:5010
+
+	gnome-terminal \
+	--maximize \
+	--window-with-profile=KeepTitle \
+		--working-directory=/home/$USER/$P1 \
+		--title="$P1" \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1/uClinux \
 		--title="uClinux" \
@@ -74,7 +107,8 @@ function term {
 		--title="uClinux/user" \
 	--tab-with-profile=KeepTitle \
 		--working-directory=/home/$USER/$P1 \
-		--title="$dongle_name [$dongle_ip]"
+		--title="$dongle_name [$dongle_ip]" \
+		--command="telnet $dongle_ip 50"
 }
 
 function gitlog {
@@ -132,6 +166,9 @@ case "$CMD" in
 	;;
     termandroid)
 	termandroid
+	;;
+    termVSE)
+	termVSE
 	;;
     term)
 	if [ "$P1" == "" ]; then
